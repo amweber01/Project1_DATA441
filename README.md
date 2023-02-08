@@ -9,3 +9,5 @@ Locally weighted regression is a method for computing a non-linear trend line fo
 Local properties are relative to a metric, which is a method by which we compute the distance between two observations. Observations contain multiple features, and if they are numeric, we can see them as vectors. The equation for calculating the distance between two p-dimensional vectors is as follows:
 
 $$ dist(\vec{v},\vec{w})=\sqrt{(v_1-w_1)^2+(v_2-w_2)^2+...(v_p-w_p)^2}$$
+
+In the end, you have the same number of weight vectors as there are different observations in the data.
