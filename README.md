@@ -6,7 +6,7 @@ The main idea of linear regression is to make predictions as a weighted combinat
 
 <img src="regression.png" width="700" height="100" alt="hi" class="inline"/>
 
-Locally weighted regression is a method for computing a non-linear trend line for data. This ability is important, as many real-life associations and trends are not linear. Locally weighted regression uses a kernel to calculate a linear regression for the neighborhood each data point, that, when stitched together, show the overall (often non-linear) trend for the data. So, even though trends and associations are generally nonlinear, they can be locally interpreted linearly.
+Locally weighted regression is a method for computing a non-linear trend line for data. This ability is important, as many real-life associations and trends are not linear. Locally weighted regression uses a kernel to calculate a linear regression for the neighborhood of each data point, that, when stitched together, show the overall (often non-linear) trend for the data. So, even though trends and associations are generally non-linear, they can be locally interpreted linearly.
 
 Local properties are relative to a metric, which is a method by which we compute the distance between two observations. Observations contain multiple features, and if they are numeric, we can see them as vectors. The equation for calculating the distance between two p-dimensional vectors is as follows:
 
@@ -104,3 +104,51 @@ plt.show()
 The plot will look something like this:
 
 <img src="weightedregplot.png" width="600" height="400" alt="hi" class="inline"/>
+
+#### A Scikit-Learn Compliant Function
+
+Below is an implementation of locally weighted regression that can be used like a Scikit-Learn function with model.fit and model.predict. This function works especially well with training and testing splits in order to externally validate results by calculating the mean squared error of the testing data. If you run this code, you can see the locally weighted regression works quite well: the mse is very small!
+
+```Python
+from sklearn.utils.validation import check_is_fitted
+from sklearn.model_selection import train_test_split as tts
+from sklearn.metrics import mean_squared_error as mse
+
+class Lowess:
+    def __init__(self, kernel = Epanechnikov, tau=0.05):
+        self.kernel = kernel
+        self.tau = tau
+    
+    def fit(self, x, y):
+        kernel = self.kernel
+        tau = self.tau
+        self.xtrain_ = x
+        self.yhat_ = y
+
+    def predict(self, x_new):
+        check_is_fitted(self)
+        x = self.xtrain_
+        y = self.yhat_
+
+        w = weights_matrix(x,x_new,self.kernel,self.tau)
+
+        if np.isscalar(x_new):
+          lm.fit(np.diag(w).dot(x.reshape(-1,1)),np.diag(w).dot(y.reshape(-1,1)))
+          yest = lm.predict([[x_new]])[0][0]
+        else:
+          n = len(x_new)
+          yest_test = np.zeros(n)
+          #Looping through all x-points
+          for i in range(n):
+            lm.fit(np.diag(w[i,:]).dot(x.reshape(-1,1)),np.diag(w[i,:]).dot(y.reshape(-1,1)))
+            yest_test[i] = lm.predict(x_new[i].reshape(-1,1))
+        return yest_test
+        
+xtrain, xtest, ytrain, ytest = tts(x,ynoisy,test_size=0.2,shuffle=True,random_state=123)
+        
+model = Lowess(kernel=Epanechnikov,tau=0.03)
+model.fit(xtrain,ytrain)
+mse(model.predict(xtest),ytest)
+```
+
+Locally weighted regression is a simple yet powerful tool for modelling real-world, non-linear data. Non-linear trends can be obtained by breaking down the regression into small, linear components. With the right choice of kernel and tau, the error from this method can be miniscule.
