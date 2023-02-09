@@ -101,3 +101,6 @@ plt.plot(x,y,color='green',lw=2,label='Truth')
 plt.legend()
 plt.show()
 ```
+The plot will look something like this:
+
+<img src="weightedregplot.png" width="600" height="400" alt="hi" class="inline"/>
