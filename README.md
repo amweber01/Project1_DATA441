@@ -34,38 +34,70 @@ To complete a locally weighted regression with sample data, you can use the code
 
 First, you need to import the appropriate libraries.
 
-'''Python
+```Python
 import numpy as np
+
 from sklearn.linear_model import LinearRegression
-'''
+```
+
 
 Next, define some functions. This example uses an Epanechnikov kernel.
 
-'''Python
+```Python
 def Epanechnikov(x):
   return np.where(np.abs(x)>1,0,3/4*(1-np.abs(x)**2)) 
  
 def kernel_function(xi,x0,kern, tau): 
-    return kern((xi - x0)/(2*tau))
+  return kern((xi - x0)/(2*tau))
     
- def weights_matrix(x,x_new,kern,tau):
+def weights_matrix(x,x_new,kern,tau):
   if np.isscalar(x_new):
     return kernel_function(x,x_new,kern,tau)
   else:
     n = len(x_new)
     return np.array([kernel_function(x,x_new[i],kern,tau)
+```
 
+```Python
 def lowess(x, y, x_new, kern, tau=0.05):
-    w = weights_matrix(x,x_new,kern,tau) 
-    if np.isscalar(x_new):
-      lm.fit(np.diag(w).dot(x.reshape(-1,1)),np.diag(w).dot(y.reshape(-1,1)))
-      yest = lm.predict([[x_new]])[0][0]
-    else:
-      n = len(x_new)
-      yest = np.zeros(n)
-      for i in range(n):
-        lm.fit(np.diag(w[i,:]).dot(x.reshape(-1,1)),np.diag(w[i,:]).dot(y.reshape(-1,1)))
-        yest[i] = lm.predict(x_new[i].reshape(-1,1)) 
+  w = weights_matrix(x,x_new,kern,tau) 
+  if np.isscalar(x_new):
+    lm.fit(np.diag(w).dot(x.reshape(-1,1)),np.diag(w).dot(y.reshape(-1,1)))
+    yest = lm.predict([[x_new]])[0][0]
+  else:
+    n = len(x_new)
+    yest = np.zeros(n)
+    for i in range(n):
+      lm.fit(np.diag(w[i,:]).dot(x.reshape(-1,1)),np.diag(w[i,:]).dot(y.reshape(-1,1)))
+      yest[i] = lm.predict(x_new[i].reshape(-1,1)) 
 
-    return yest
-'''
+  return yest
+```
+
+After defining the functions, you can simulate some noisy data.
+
+```Python
+lm = LinearRegression()
+x = np.linspace(0,4,201)
+noise = np.random.normal(loc = 0, scale = .2, size = len(x))
+y = np.sin(x**2 * 1.5 * np.pi ) 
+ynoisy = y + noise
+```
+
+Lastly, run the regression. Here, we use a tau of 0.03.
+
+```Python
+yest = lowess(x,ynoisy,x,Epanechnikov,0.03)
+```
+
+If you want to visualize the locally weighted regression versus the truth, you can run this code:
+
+```Python
+import matplotlib.pyplot as plt
+plt.figure(figsize=(10,6))
+plt.scatter(x,ynoisy,ec='blue',alpha=0.5)
+plt.plot(x,yest,color='red',lw=2,label='Kernel Regression')
+plt.plot(x,y,color='green',lw=2,label='Truth')
+plt.legend()
+plt.show()
+```
