@@ -27,3 +27,45 @@ Four possible kernel options are the Exponential, the Tricubic, the Epanechnikov
 #### Tau
 
 Tau is a hyperparameter that controls the bandwidth of the kernel. Changing tau will change the weights for calculating the neighborhood around each observation, yielding slightly different locally weighted regressions as it is adjusted. A value for tau must be chosen in addition to the type of kernel being used.
+
+### A Simple Implementation
+
+To complete a locally weighted regression with sample data, you can use the code below.
+
+First, you need to import the appropriate libraries.
+
+'''Python
+import numpy as np
+from sklearn.linear_model import LinearRegression
+'''
+
+Next, define some functions. This example uses an Epanechnikov kernel.
+
+'''Python
+def Epanechnikov(x):
+  return np.where(np.abs(x)>1,0,3/4*(1-np.abs(x)**2)) 
+ 
+def kernel_function(xi,x0,kern, tau): 
+    return kern((xi - x0)/(2*tau))
+    
+ def weights_matrix(x,x_new,kern,tau):
+  if np.isscalar(x_new):
+    return kernel_function(x,x_new,kern,tau)
+  else:
+    n = len(x_new)
+    return np.array([kernel_function(x,x_new[i],kern,tau)
+
+def lowess(x, y, x_new, kern, tau=0.05):
+    w = weights_matrix(x,x_new,kern,tau) 
+    if np.isscalar(x_new):
+      lm.fit(np.diag(w).dot(x.reshape(-1,1)),np.diag(w).dot(y.reshape(-1,1)))
+      yest = lm.predict([[x_new]])[0][0]
+    else:
+      n = len(x_new)
+      yest = np.zeros(n)
+      for i in range(n):
+        lm.fit(np.diag(w[i,:]).dot(x.reshape(-1,1)),np.diag(w[i,:]).dot(y.reshape(-1,1)))
+        yest[i] = lm.predict(x_new[i].reshape(-1,1)) 
+
+    return yest
+'''
