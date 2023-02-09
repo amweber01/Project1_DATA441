@@ -20,7 +20,7 @@ When you are preparing to run a locally weighted regression, there are first som
 
 <img src="Loess_1.drawio.svg" width="400" height="300" alt="hi" class="inline"/>
 
-Four possible kernel options are the Exponential, the Tricubic, the Epanechnikov, and the Quartic. You can see by looking at the two plots below that each kernel is slightly different. For example, the Tricubic Kernel (left) has thinner tails and a flatter top than the Epanechnikov (right).
+Five possible kernel options are the Gaussian, the Exponential, the Tricubic, the Epanechnikov, and the Quartic. You can see by looking at the two plots below that each kernel is slightly different. For example, the Tricubic Kernel (left) has thinner tails and a flatter top than the Epanechnikov (right).
 
 <img src="tricubic.png" width="400" height="300" alt="hi" class="inline"/> <img src="epanechnikov.png" width="400" height="300" alt="hi" class="inline"/>
 
